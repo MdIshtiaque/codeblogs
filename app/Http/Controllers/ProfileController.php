@@ -16,9 +16,7 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+        return view('backend.pages.profile');
     }
 
     /**
@@ -26,15 +24,17 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        try{
+           //dd($request->all());
+            auth()->user()->update($request->validated());
+            upload(auth()->user(), $request);
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+
+            return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        }catch(Exception $exception){
+            dd($exception);
         }
 
-        $request->user()->save();
-
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
     /**
@@ -42,6 +42,7 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        //dd($request->all());
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
         ]);
