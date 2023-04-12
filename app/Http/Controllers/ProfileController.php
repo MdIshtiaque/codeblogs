@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-
+use Illuminate\Support\Facades\Storage;
 class ProfileController extends Controller
 {
     /**
@@ -24,14 +24,14 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        try{
-           //dd($request->all());
+        try {
+            //dd($request->all());
             auth()->user()->update($request->validated());
             upload(auth()->user(), $request);
 
 
             return Redirect::route('profile.edit')->with('status', 'profile-updated');
-        }catch(Exception $exception){
+        } catch (Exception $exception) {
             dd($exception);
         }
 
@@ -43,19 +43,29 @@ class ProfileController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         //dd($request->all());
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
+//        $request->validateWithBag('userDeletion', [
+//            'password' => ['required', 'current_password'],
+//        ]);
+//
+//        $user = $request->user();
+//
+//        Auth::logout();
+//
+//        $user->delete();
+//
+//        $request->session()->invalidate();
+//        $request->session()->regenerateToken();
+        $image = auth()->user()->image;
+        if ($request->user()->image) {
 
-        $user = $request->user();
+            $photo_location = 'uploads/' . $image;
+            unlink($photo_location);
+            $user = Auth::user();
+            Storage::delete($user->image);
+            $user->image = null;
+            $user->save();
+            return Redirect()->back();
+        }
 
-        Auth::logout();
-
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
     }
 }

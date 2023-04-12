@@ -242,25 +242,36 @@
                                     <button type="submit" class="btn btn-primary w-20 mt-3">Save</button>
                                 </div>
                             </form>
-                            <form action="{{ route('profile.update') }}" method="post" enctype="multipart/form-data">
-                                @csrf
-                                @method('PATCH')
-                                <div class="w-52 mx-auto xl:mr-0 xl:ml-6">
-                                    <div class="border-2 border-dashed shadow-sm border-slate-200/60 dark:border-darkmode-400 rounded-md p-5">
+                            <div class="w-52 mx-auto xl:mr-0 xl:ml-6">
+                                <div
+                                    class="border-2 border-dashed shadow-sm border-slate-200/60 dark:border-darkmode-400 rounded-md p-5">
+                                    <form action="{{ route('profile.update') }}" method="post"
+                                          enctype="multipart/form-data">
+                                        @csrf
+                                        @method('PATCH')
                                         <div class="h-40 relative image-fit cursor-pointer zoom-in mx-auto">
-                                            <img class="rounded-md" alt="Rubick Tailwind HTML Admin Template" src="{{asset('uploads/'. auth()->user()->image)}}">
-                                            <form action="{{ route('profile.destroy', 'image') }}" method="post" enctype="multipart/form-data">
-                                                @csrf
-                                                <button type="submit" title="Remove this profile photo?" class="tooltip w-5 h-5 flex items-center justify-center absolute rounded-full text-white bg-danger right-0 top-0 -mr-2 -mt-2"> <i data-feather="x" class="w-4 h-4"></i> </button>
-                                            </form>
-                                            <input type="file" name="image" class="w-full h-full top-0 left-0 absolute opacity-0">
+                                            <img class="rounded-md" alt="Rubick Tailwind HTML Admin Template"
+                                                 src="{{auth()->user()->image != '' ? asset('uploads/'. auth()->user()->image) : asset('uploads/default.jpg')}}">
+
+
+                                            <input type="file" name="image"
+                                                   class="w-full h-full top-0 left-0 absolute opacity-0">
                                         </div>
                                         <div class="mx-auto cursor-pointer relative mt-5">
                                             <button type="submit" class="btn btn-primary w-full">Change Photo</button>
                                         </div>
-                                    </div>
+                                    </form>
+                                    @if(auth()->user()->image != '')
+                                        <form action="{{ route('profile.destroy', 'image') }}" method="post"
+                                              enctype="multipart/form-data">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger w-full mt-3">Delete Photo
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
